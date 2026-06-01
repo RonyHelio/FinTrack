@@ -31,9 +31,22 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // ─── Auth (rotas canônicas) ───────────────────────────────
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        // ─── Auth (rotas legadas mantidas por compatibilidade) ────
                         .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/usuarios/login").permitAll()
+                        // ─── Swagger / OpenAPI ────────────────────────────────────
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml"
+                        ).permitAll()
+                        // ─── CORS preflight ───────────────────────────────────────
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // ─── Tudo o mais requer autenticação ─────────────────────
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

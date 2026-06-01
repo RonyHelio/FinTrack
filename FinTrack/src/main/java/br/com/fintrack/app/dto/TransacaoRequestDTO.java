@@ -9,9 +9,6 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 public record TransacaoRequestDTO(
-        @NotNull(message = "ID do usuário é obrigatório")
-        UUID usuarioId,
-
         @NotNull(message = "ID da categoria é obrigatório")
         UUID categoriaId,
 
