@@ -78,6 +78,7 @@ Abra o seu terminal (Prompt de Comando, PowerShell ou terminal do VS Code) e cer
 **3. Execute o comando de inicialização:**
 Digite o comando abaixo e aperte Enter:
 ```bash
+cd FinTrack  # Certifique-se de estar dentro da pasta raiz do projeto
 docker-compose up --build -d
 ```
 *A primeira vez que você rodar esse comando pode demorar alguns minutos, pois o Docker vai baixar todas as ferramentas e compilar o código do zero.*
