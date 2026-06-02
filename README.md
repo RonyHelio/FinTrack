@@ -63,20 +63,31 @@ Aplicativo mobile de controle financeiro pessoal desenvolvido como Prova de Conc
 
 ---
 
-## 🚀 Como Rodar o Backend
+## 🚀 Como Rodar o Projeto (Recomendado)
 
-### Opção 1: Docker Compose (recomendado)
+### Docker Compose (Tudo-em-Um)
+
+Agora o projeto inteiro está containerizado (Banco de Dados, Backend e Frontend Web).
 
 ```bash
 # Na raiz do projeto
-docker-compose up -d
+docker-compose up --build -d
 ```
 
-Isso sobe o PostgreSQL (porta 5432) e o Spring Boot (porta 8080) automaticamente.
+Isso vai subir:
+- **PostgreSQL** (Porta 5433 no host, 5432 interna)
+- **Spring Boot API** (Porta 8080)
+- **Frontend Expo Web** (Porta 8081)
 
-### Opção 2: Manual
+Após os containers subirem:
+1. Abra o navegador e acesse a Aplicação Web em: [http://localhost:8081](http://localhost:8081)
+2. Acesse o Swagger do Backend em: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
-#### 1. Criar o banco de dados
+---
+
+## 🛠 Como Rodar Manualmente (Sem Docker)
+
+### 1. Criar o banco de dados
 
 ```sql
 CREATE DATABASE fintrack;
@@ -111,35 +122,31 @@ Abra no navegador: [http://localhost:8080/swagger-ui.html](http://localhost:8080
 
 ---
 
-## 📱 Como Rodar o Frontend
+## 📱 Como Rodar o Frontend (Manualmente)
+
+Se não quiser usar o Docker para o frontend, você pode rodá-lo localmente:
 
 ### 1. Instalar dependências
 
 ```bash
 cd frontend
-npm install
+npm install --legacy-peer-deps
 ```
 
 ### 2. Configurar o IP da API
 
-Edite o arquivo `frontend/src/constants/index.ts` e ajuste o `API_BASE_URL` com o IP da sua rede local:
+Edite o arquivo `frontend/src/constants/index.ts` e ajuste o `API_BASE_URL` para apontar para o seu backend. Se estiver rodando como Web App no mesmo computador, `http://localhost:8080/api` funciona perfeitamente. Para celular, use o IP da sua rede local (ex: `http://192.168.0.x:8080/api`).
 
-```typescript
-export const API_BASE_URL = "http://SEU_IP_LOCAL:8080/api";
-```
-
-> 💡 Para descobrir seu IP: `ipconfig` (Windows) ou `ifconfig` (Mac/Linux).
-
-### 3. Iniciar o Expo
+### 3. Iniciar o Expo Web
 
 ```bash
-npx expo start
+npx expo start --web
 ```
 
-### 4. Testar no celular
+### 4. Testar no navegador ou celular
 
-- Escaneie o QR Code com o **Expo Go** (Android) ou a câmera do iPhone
-- Ou pressione `a` para abrir no emulador Android
+- Acesse a interface Web no navegador gerado (geralmente `localhost:8081`)
+- Ou escaneie o QR Code com o **Expo Go** (apenas compatível se alinhado ao SDK 54).
 
 ---
 

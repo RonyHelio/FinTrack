@@ -1,4 +1,4 @@
-export const API_BASE_URL = "http://192.168.0.123:8080/api"; // IP da rede local — funciona em dispositivos físicos e emuladores
+export const API_BASE_URL = "http://localhost:8080/api"; // URL do backend rodando no host
 
 export const COLORS = {
   primary: {
