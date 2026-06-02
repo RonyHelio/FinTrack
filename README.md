@@ -63,90 +63,69 @@ Aplicativo mobile de controle financeiro pessoal desenvolvido como Prova de Conc
 
 ---
 
-## 🚀 Como Rodar o Projeto (Recomendado)
+## 🚀 Como Rodar o Projeto (Recomendado: via Docker)
 
-### Docker Compose (Tudo-em-Um)
+A maneira mais fácil e garantida de rodar o FinTrack é utilizando o **Docker**. Com um único comando, o Docker vai preparar o Banco de Dados, o Backend (Java) e o Frontend (Aplicativo Web) para você.
 
-Agora o projeto inteiro está containerizado (Banco de Dados, Backend e Frontend Web).
+### Passo a Passo
 
+**1. Instale o Docker Desktop:**
+Se você ainda não tem o Docker, baixe e instale o [Docker Desktop](https://www.docker.com/products/docker-desktop/) no seu computador e certifique-se de que ele está aberto e rodando.
+
+**2. Abra o terminal na pasta do projeto:**
+Abra o seu terminal (Prompt de Comando, PowerShell ou terminal do VS Code) e certifique-se de estar na pasta raiz do projeto (onde está o arquivo `docker-compose.yml`).
+
+**3. Execute o comando de inicialização:**
+Digite o comando abaixo e aperte Enter:
 ```bash
-# Na raiz do projeto
 docker-compose up --build -d
 ```
+*A primeira vez que você rodar esse comando pode demorar alguns minutos, pois o Docker vai baixar todas as ferramentas e compilar o código do zero.*
 
-Isso vai subir:
-- **PostgreSQL** (Porta 5433 no host, 5432 interna)
-- **Spring Boot API** (Porta 8080)
-- **Frontend Expo Web** (Porta 8081)
+**4. Acesse a aplicação:**
+Assim que o terminal finalizar a execução, os três sistemas estarão rodando sincronizados!
+- **📱 O Aplicativo (Frontend):** Abra no seu navegador o endereço [http://localhost:8081](http://localhost:8081)
+- **⚙️ O Backend (API):** Está rodando nos bastidores na porta `8080`.
+- **📚 A Documentação da API (Swagger):** Acesse em [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
-Após os containers subirem:
-1. Abra o navegador e acesse a Aplicação Web em: [http://localhost:8081](http://localhost:8081)
-2. Acesse o Swagger do Backend em: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+**Dica:** Para parar o projeto quando terminar de usar, basta rodar no terminal:
+```bash
+docker-compose down
+```
 
 ---
 
 ## 🛠 Como Rodar Manualmente (Sem Docker)
 
-### 1. Criar o banco de dados
+Se preferir rodar cada parte manualmente (ideal para desenvolvimento isolado), siga os passos abaixo nesta exata ordem:
 
+### 1. Subir o Banco de Dados
+Você precisará de um servidor PostgreSQL rodando localmente (na porta 5432). Crie um banco chamado `fintrack` e um usuário `fintrack_user` com a senha `fintrack_pass`:
 ```sql
 CREATE DATABASE fintrack;
 CREATE USER fintrack_user WITH PASSWORD 'fintrack_pass';
 GRANT ALL PRIVILEGES ON DATABASE fintrack TO fintrack_user;
 ```
 
-#### 2. Configurar o `application.properties`
-
-O arquivo já está configurado em `FinTrack/src/main/resources/application.properties`. Ajuste as credenciais se necessário:
-
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/fintrack
-spring.datasource.username=fintrack_user
-spring.datasource.password=fintrack_pass
-```
-
-#### 3. Rodar o backend
-
+### 2. Subir o Backend (Java Spring Boot)
+No seu terminal, entre na pasta do backend e rode o projeto via Maven:
 ```bash
 cd FinTrack
 mvn spring-boot:run
 ```
+*A API ficará disponível em [http://localhost:8080/api](http://localhost:8080/api).*
 
-O backend estará disponível em `http://localhost:8080`.
-
-#### 4. Acessar o Swagger
-
-Abra no navegador: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
-
-> ⚠️ Na primeira execução, o `DataInitializer` cria automaticamente 8 categorias globais: Alimentação, Transporte, Moradia, Lazer, Saúde, Educação, Salário e Investimentos.
-
----
-
-## 📱 Como Rodar o Frontend (Manualmente)
-
-Se não quiser usar o Docker para o frontend, você pode rodá-lo localmente:
-
-### 1. Instalar dependências
-
+### 3. Subir o Frontend (React Native Web)
+Abra **outro** terminal, entre na pasta do frontend e instale as bibliotecas necessárias:
 ```bash
 cd frontend
 npm install --legacy-peer-deps
 ```
-
-### 2. Configurar o IP da API
-
-Edite o arquivo `frontend/src/constants/index.ts` e ajuste o `API_BASE_URL` para apontar para o seu backend. Se estiver rodando como Web App no mesmo computador, `http://localhost:8080/api` funciona perfeitamente. Para celular, use o IP da sua rede local (ex: `http://192.168.0.x:8080/api`).
-
-### 3. Iniciar o Expo Web
-
+Em seguida, inicie o servidor web do aplicativo:
 ```bash
 npx expo start --web
 ```
-
-### 4. Testar no navegador ou celular
-
-- Acesse a interface Web no navegador gerado (geralmente `localhost:8081`)
-- Ou escaneie o QR Code com o **Expo Go** (apenas compatível se alinhado ao SDK 54).
+*O seu navegador deve abrir automaticamente com o aplicativo rodando em [http://localhost:8081](http://localhost:8081). Se for testar pelo celular, leia as instruções no terminal do Expo.*
 
 ---
 
