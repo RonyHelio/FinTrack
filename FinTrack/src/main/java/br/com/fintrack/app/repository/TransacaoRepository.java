@@ -67,7 +67,7 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID> {
             SELECT t
             FROM Transacao t
             WHERE t.usuario.id = :usuarioId
-              AND t.tipo = 'despesa'
+              AND t.tipo = br.com.fintrack.app.entity.TipoTransacao.DESPESA
               AND t.data >= :inicio
               AND t.data <= :fim
             ORDER BY t.data DESC
