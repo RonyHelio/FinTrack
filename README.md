@@ -75,10 +75,17 @@ Se você ainda não tem o Docker, baixe e instale o [Docker Desktop](https://www
 **2. Abra o terminal na pasta do projeto:**
 Abra o seu terminal (Prompt de Comando, PowerShell ou terminal do VS Code) e certifique-se de estar na pasta raiz do projeto (onde está o arquivo `docker-compose.yml`).
 
-**3. Execute o comando de inicialização:**
-Digite o comando abaixo e aperte Enter:
+**3. Clone o repositório e entre na pasta:**
 ```bash
-cd FinTrack  # Certifique-se de estar dentro da pasta raiz do projeto
+git clone https://github.com/RonyHelio/FinTrack.git
+cd FinTrack
+```
+
+> ⚠️ **Atenção:** O comando `docker-compose` deve ser executado na pasta raiz do projeto (onde está o arquivo `docker-compose.yml`). **Não** entre na subpasta `FinTrack/FinTrack/` (que é o backend).
+
+**4. Execute o comando de inicialização:**
+Certifique-se de que o **Docker Desktop está aberto e rodando**, depois digite:
+```bash
 docker-compose up --build -d
 ```
 *A primeira vez que você rodar esse comando pode demorar alguns minutos, pois o Docker vai baixar todas as ferramentas e compilar o código do zero.*
