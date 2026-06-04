@@ -38,6 +38,16 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<ApiError>) => {
+    // ─── Auto-logout: token inválido ou expirado ─────────────────
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      // Limpa token velho do navegador e força volta à tela de login
+      SecureStore.deleteItemAsync("fintrack_auth_token");
+      SecureStore.deleteItemAsync("fintrack_user_data");
+      if (typeof window !== "undefined") {
+        window.location.reload();
+      }
+    }
+
     if (error.response?.data?.mensagem) {
       const apiError: ApiError = {
         status: error.response.status,

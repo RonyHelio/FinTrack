@@ -54,86 +54,115 @@ Aplicativo mobile de controle financeiro pessoal desenvolvido como Prova de Conc
 
 ## ✅ Pré-requisitos
 
-- **Java 17+** (JDK)
-- **Maven 3.9+**
-- **PostgreSQL 15+** (ou Docker)
-- **Node.js 18+** e **npm 9+**
-- **Expo CLI** (`npx expo`)
-- **Expo Go** no celular (Android/iOS) ou emulador Android
+Para rodar via **Docker** (recomendado), você só precisa de:
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado e **aberto** (ícone da baleia 🐳 visível na barra de tarefas)
+
+Para rodar **manualmente** (sem Docker), você precisa de:
+- **Java 17+** (JDK) — [Download](https://adoptium.net/)
+- **Maven 3.9+** — [Download](https://maven.apache.org/download.cgi)
+- **PostgreSQL 15+** — [Download](https://www.postgresql.org/download/)
+- **Node.js 20+** e **npm** — [Download](https://nodejs.org/)
 
 ---
 
 ## 🚀 Como Rodar o Projeto (Recomendado: via Docker)
 
-A maneira mais fácil e garantida de rodar o FinTrack é utilizando o **Docker**. Com um único comando, o Docker vai preparar o Banco de Dados, o Backend (Java) e o Frontend (Aplicativo Web) para você.
+A maneira mais fácil de rodar o FinTrack. Com **3 comandos** o Docker prepara tudo automaticamente (Banco de Dados + Backend + Frontend).
 
-### Passo a Passo
+### Passo 1 — Abra o Docker Desktop
 
-**1. Instale o Docker Desktop:**
-Se você ainda não tem o Docker, baixe e instale o [Docker Desktop](https://www.docker.com/products/docker-desktop/) no seu computador e certifique-se de que ele está aberto e rodando.
+Antes de qualquer coisa, abra o aplicativo **Docker Desktop** no seu computador e **aguarde** ele inicializar completamente (o ícone da baleia 🐳 na barra de tarefas deve ficar estável, sem animação de carregamento).
 
-**2. Abra o terminal na pasta do projeto:**
-Abra o seu terminal (Prompt de Comando, PowerShell ou terminal do VS Code) e certifique-se de estar na pasta raiz do projeto (onde está o arquivo `docker-compose.yml`).
+> ⚠️ **Se o Docker Desktop não estiver aberto, nenhum comando `docker` vai funcionar!** Você verá um erro parecido com: `failed to connect to the docker API`.
 
-**3. Clone o repositório e entre na pasta:**
+### Passo 2 — Clone o repositório
+
+Abra um terminal (PowerShell, Prompt de Comando ou terminal do VS Code) e execute:
+
 ```bash
 git clone https://github.com/RonyHelio/FinTrack.git
+```
+
+### Passo 3 — Entre na pasta do projeto
+
+```bash
 cd FinTrack
 ```
 
-> ⚠️ **Atenção:** O comando `docker-compose` deve ser executado na pasta raiz do projeto (onde está o arquivo `docker-compose.yml`). **Não** entre na subpasta `FinTrack/FinTrack/` (que é o backend).
+> ⚠️ **Cuidado:** O projeto possui uma subpasta que também se chama `FinTrack/` (é o backend Java). **NÃO** entre nela. Você deve ficar na **pasta raiz**, que é a que contém o arquivo `docker-compose.yml`. Para confirmar, rode `dir` (Windows) ou `ls` (Mac/Linux) e verifique se o arquivo `docker-compose.yml` aparece na listagem.
 
-**4. Execute o comando de inicialização:**
-Certifique-se de que o **Docker Desktop está aberto e rodando**, depois digite:
+### Passo 4 — Suba todos os containers
+
 ```bash
 docker-compose up --build -d
 ```
-*A primeira vez que você rodar esse comando pode demorar alguns minutos, pois o Docker vai baixar todas as ferramentas e compilar o código do zero.*
 
-**4. Acesse a aplicação:**
-Assim que o terminal finalizar a execução, os três sistemas estarão rodando sincronizados!
-- **📱 O Aplicativo (Frontend):** Abra no seu navegador o endereço [http://localhost:8081](http://localhost:8081)
-- **⚙️ O Backend (API):** Está rodando nos bastidores na porta `8080`.
-- **📚 A Documentação da API (Swagger):** Acesse em [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+> ⏳ **Na primeira vez** esse comando vai demorar de **3 a 5 minutos**, pois o Docker precisa baixar as imagens base (Java, Node, PostgreSQL) e compilar o código. Nas próximas vezes será muito mais rápido.
 
-**Dica:** Para parar o projeto quando terminar de usar, basta rodar no terminal:
+### Passo 5 — Acesse no navegador
+
+Aguarde uns 30 segundos após o comando terminar (o backend precisa inicializar) e então abra:
+
+| O quê | Endereço |
+|-------|----------|
+| 📱 **Aplicação Web (Frontend)** | [http://localhost:8081](http://localhost:8081) |
+| 📚 **Documentação da API (Swagger)** | [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) |
+
+### Como parar o projeto
+
+Para encerrar todos os containers quando terminar de usar:
+
 ```bash
 docker-compose down
 ```
+
+### 🔧 Solução de problemas comuns
+
+| Problema | Solução |
+|----------|---------|
+| `failed to connect to the docker API` | Abra o Docker Desktop e espere ele carregar. |
+| `localhost:8081` não abre | Aguarde ~30 segundos. O frontend demora um pouco para compilar na primeira vez. |
+| `403 Forbidden` nas requisições | Faça logout e login novamente. O token JWT pode ter expirado. |
+| `cd FinTrack` deu erro | Você já pode estar dentro da pasta. Rode `dir` e veja se `docker-compose.yml` aparece. |
 
 ---
 
 ## 🛠 Como Rodar Manualmente (Sem Docker)
 
-Se preferir rodar cada parte manualmente (ideal para desenvolvimento isolado), siga os passos abaixo nesta exata ordem:
+Se preferir rodar cada parte separadamente, siga os passos abaixo **nesta exata ordem**:
 
-### 1. Subir o Banco de Dados
-Você precisará de um servidor PostgreSQL rodando localmente (na porta 5432). Crie um banco chamado `fintrack` e um usuário `fintrack_user` com a senha `fintrack_pass`:
+### Passo 1 — Banco de Dados
+
+Abra o pgAdmin ou o terminal do PostgreSQL e crie o banco:
+
 ```sql
 CREATE DATABASE fintrack;
 CREATE USER fintrack_user WITH PASSWORD 'fintrack_pass';
 GRANT ALL PRIVILEGES ON DATABASE fintrack TO fintrack_user;
 ```
 
-### 2. Subir o Backend (Java Spring Boot)
-No seu terminal, entre na pasta do backend e rode o projeto via Maven:
+### Passo 2 — Backend (Java Spring Boot)
+
+Abra um terminal, entre na pasta do backend e rode:
+
 ```bash
-cd FinTrack
+cd FinTrack/FinTrack
 mvn spring-boot:run
 ```
-*A API ficará disponível em [http://localhost:8080/api](http://localhost:8080/api).*
 
-### 3. Subir o Frontend (React Native Web)
-Abra **outro** terminal, entre na pasta do frontend e instale as bibliotecas necessárias:
+Aguarde até ver no terminal a mensagem `Started FinTrackApplication`. A API estará disponível em `http://localhost:8080/api`.
+
+### Passo 3 — Frontend (React Native Web)
+
+Abra **outro terminal** (sem fechar o do backend), entre na pasta do frontend:
+
 ```bash
-cd frontend
+cd FinTrack/frontend
 npm install --legacy-peer-deps
-```
-Em seguida, inicie o servidor web do aplicativo:
-```bash
 npx expo start --web
 ```
-*O seu navegador deve abrir automaticamente com o aplicativo rodando em [http://localhost:8081](http://localhost:8081). Se for testar pelo celular, leia as instruções no terminal do Expo.*
+
+O navegador vai abrir automaticamente com o app rodando em [http://localhost:8081](http://localhost:8081).
 
 ---
 
