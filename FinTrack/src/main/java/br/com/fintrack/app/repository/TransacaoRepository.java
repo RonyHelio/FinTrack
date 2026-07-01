@@ -80,27 +80,68 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID> {
     // ─── Filtro combinado (mês/ano + categoria + tipo) ────────────────────────
 
     /**
-     * Filtra transações do usuário com parâmetros opcionais.
-     * Valores null ignoram o filtro correspondente.
-     * Período: se inicio/fim forem null, não filtra por data.
-     * categoriaId: se null, inclui todas as categorias.
-     * tipo: se null, inclui receitas e despesas.
+     * Filtra COM data e COM tipo.
      */
     @Query("""
             SELECT t FROM Transacao t
             WHERE t.usuario.id = :usuarioId
-              AND (:inicio IS NULL OR t.data >= :inicio)
-              AND (:fim IS NULL OR t.data <= :fim)
+              AND t.data >= :inicio
+              AND t.data <= :fim
               AND (:categoriaId IS NULL OR t.categoria.id = :categoriaId)
-              AND (:tipo IS NULL OR t.tipo = :tipo)
+              AND t.tipo = :tipo
             ORDER BY t.data DESC
             """)
-    List<Transacao> findByFiltros(
+    List<Transacao> findByFiltrosComDataComTipo(
             @Param("usuarioId") UUID usuarioId,
             @Param("inicio") LocalDate inicio,
             @Param("fim") LocalDate fim,
             @Param("categoriaId") UUID categoriaId,
             @Param("tipo") TipoTransacao tipo);
+
+    /**
+     * Filtra COM data e SEM tipo.
+     */
+    @Query("""
+            SELECT t FROM Transacao t
+            WHERE t.usuario.id = :usuarioId
+              AND t.data >= :inicio
+              AND t.data <= :fim
+              AND (:categoriaId IS NULL OR t.categoria.id = :categoriaId)
+            ORDER BY t.data DESC
+            """)
+    List<Transacao> findByFiltrosComDataSemTipo(
+            @Param("usuarioId") UUID usuarioId,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            @Param("categoriaId") UUID categoriaId);
+
+    /**
+     * Filtra SEM data e COM tipo.
+     */
+    @Query("""
+            SELECT t FROM Transacao t
+            WHERE t.usuario.id = :usuarioId
+              AND (:categoriaId IS NULL OR t.categoria.id = :categoriaId)
+              AND t.tipo = :tipo
+            ORDER BY t.data DESC
+            """)
+    List<Transacao> findByFiltrosSemDataComTipo(
+            @Param("usuarioId") UUID usuarioId,
+            @Param("categoriaId") UUID categoriaId,
+            @Param("tipo") TipoTransacao tipo);
+
+    /**
+     * Filtra SEM data e SEM tipo (apenas categoria opcional).
+     */
+    @Query("""
+            SELECT t FROM Transacao t
+            WHERE t.usuario.id = :usuarioId
+              AND (:categoriaId IS NULL OR t.categoria.id = :categoriaId)
+            ORDER BY t.data DESC
+            """)
+    List<Transacao> findByFiltrosSemDataSemTipo(
+            @Param("usuarioId") UUID usuarioId,
+            @Param("categoriaId") UUID categoriaId);
 
     // ─── Legados mantidos por compatibilidade ─────────────────────────────────
 

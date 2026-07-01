@@ -122,11 +122,26 @@ public class TransacaoService {
             tipo = TipoTransacao.fromValor(tipoStr);
         }
 
-        return transacaoRepository
-                .findByFiltros(usuarioAutenticadoId, inicio, fim, categoriaId, tipo)
-                .stream()
-                .map(this::toResponseDTO)
-                .toList();
+        // Seleciona a query correta para evitar IS NULL com enum no PostgreSQL
+        List<Transacao> resultado;
+        boolean temData = inicio != null && fim != null;
+        boolean temTipo = tipo != null;
+
+        if (temData && temTipo) {
+            resultado = transacaoRepository.findByFiltrosComDataComTipo(
+                    usuarioAutenticadoId, inicio, fim, categoriaId, tipo);
+        } else if (temData) {
+            resultado = transacaoRepository.findByFiltrosComDataSemTipo(
+                    usuarioAutenticadoId, inicio, fim, categoriaId);
+        } else if (temTipo) {
+            resultado = transacaoRepository.findByFiltrosSemDataComTipo(
+                    usuarioAutenticadoId, categoriaId, tipo);
+        } else {
+            resultado = transacaoRepository.findByFiltrosSemDataSemTipo(
+                    usuarioAutenticadoId, categoriaId);
+        }
+
+        return resultado.stream().map(this::toResponseDTO).toList();
     }
 
     /**
