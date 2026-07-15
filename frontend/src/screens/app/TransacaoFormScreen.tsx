@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { transacaoService } from "../../services/transacaoService";
 import { categoriaService } from "../../services/categoriaService";
+import { useNotification } from "../../contexts/NotificationContext";
 import { todayISO } from "../../utils/format";
 import type { CategoriaResponse, TransacaoRequest, ApiError } from "../../types";
 import type { RootStackParamList } from "../../navigation/RootNavigator";
@@ -34,6 +35,11 @@ export default function TransacaoFormScreen() {
   const [data, setData] = useState(editando?.data ?? todayISO());
   const [descricao, setDescricao] = useState(editando?.descricao ?? "");
 
+  const [contaId, setContaId] = useState("1"); // Mock account ID
+  const [parcelado, setParcelado] = useState(false);
+  const [numParcelas, setNumParcelas] = useState("");
+
+  const { showNotification } = useNotification();
   const [categorias, setCategorias] = useState<CategoriaResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingCategorias, setLoadingCategorias] = useState(true);
@@ -92,14 +98,12 @@ export default function TransacaoFormScreen() {
 
       if (editando) {
         await transacaoService.atualizar(editando.id, payload);
-        Alert.alert("Sucesso", "Transação atualizada!", [
-          { text: "OK", onPress: () => navigation.goBack() },
-        ]);
+        showNotification("Transação atualizada com sucesso!");
+        navigation.goBack();
       } else {
         await transacaoService.criar(payload);
-        Alert.alert("Sucesso", "Transação criada!", [
-          { text: "OK", onPress: () => navigation.goBack() },
-        ]);
+        showNotification("Transação criada com sucesso!");
+        navigation.goBack();
       }
     } catch (error) {
       const apiError = error as ApiError;
@@ -233,6 +237,63 @@ export default function TransacaoFormScreen() {
             value={data}
             onChangeText={(text) => setData(formatDataInput(text))}
           />
+
+          {/* ─── Conta (Mock) ────────────────────────────────────── */}
+          <Text className="text-dark-muted text-sm mb-2" style={{ fontFamily: "Inter_500Medium" }}>
+            Conta
+          </Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-5 max-h-12">
+            {[ { id: "1", nome: "Nubank" }, { id: "2", nome: "Itaú" } ].map((conta) => (
+              <TouchableOpacity
+                key={conta.id}
+                className={`flex-row items-center px-4 py-2.5 rounded-xl mr-2 ${
+                  contaId === conta.id
+                    ? "bg-primary-600"
+                    : "bg-dark-card border border-dark-border"
+                }`}
+                onPress={() => setContaId(conta.id)}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="wallet-outline" size={16} color={contaId === conta.id ? "#FFF" : "#94A3B8"} />
+                <Text
+                  className={`ml-1.5 text-xs ${contaId === conta.id ? "text-white" : "text-dark-muted"}`}
+                  style={{ fontFamily: "Inter_500Medium" }}
+                >
+                  {conta.nome}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          {/* ─── Parcelamento (RF30) ─────────────────────────────── */}
+          {tipo === "despesa" && (
+            <View className="mb-5">
+              <TouchableOpacity
+                className="flex-row items-center mb-2"
+                onPress={() => setParcelado(!parcelado)}
+                activeOpacity={0.7}
+              >
+                <View className={`w-5 h-5 rounded border items-center justify-center mr-2 ${parcelado ? 'bg-primary-500 border-primary-500' : 'bg-dark-surface border-dark-border'}`}>
+                  {parcelado && <Ionicons name="checkmark" size={14} color="#FFF" />}
+                </View>
+                <Text className="text-dark-muted text-sm" style={{ fontFamily: "Inter_500Medium" }}>
+                  Compra Parcelada?
+                </Text>
+              </TouchableOpacity>
+
+              {parcelado && (
+                <TextInput
+                  className="bg-dark-surface border border-dark-border rounded-xl px-4 py-3.5 text-dark-text text-base mt-2"
+                  style={{ fontFamily: "Inter_400Regular" }}
+                  placeholder="Número de parcelas (ex: 12)"
+                  placeholderTextColor="#64748B"
+                  keyboardType="numeric"
+                  value={numParcelas}
+                  onChangeText={setNumParcelas}
+                />
+              )}
+            </View>
+          )}
 
           {/* ─── Descrição ───────────────────────────────────────── */}
           <Text className="text-dark-muted text-sm mb-2" style={{ fontFamily: "Inter_500Medium" }}>

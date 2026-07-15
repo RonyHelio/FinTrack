@@ -13,8 +13,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { transacaoService } from "../../services/transacaoService";
+import { categoriaService } from "../../services/categoriaService";
 import { formatCurrency, formatDate } from "../../utils/format";
-import type { TransacaoResponse, TransacaoFiltro, ApiError } from "../../types";
+import type { TransacaoResponse, TransacaoFiltro, ApiError, CategoriaResponse } from "../../types";
 import type { RootStackParamList } from "../../navigation/RootNavigator";
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
@@ -35,7 +36,19 @@ export default function TransacoesScreen() {
   // Filtros
   const [mesSelecionado, setMesSelecionado] = useState(0); // 0 = Todos
   const [tipoSelecionado, setTipoSelecionado] = useState(0); // 0 = Todos
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState("all");
   const anoAtual = new Date().getFullYear();
+
+  const [categorias, setCategorias] = useState<CategoriaResponse[]>([]);
+
+  const loadCategorias = useCallback(async () => {
+    try {
+      const cats = await categoriaService.listarMinhas();
+      setCategorias(cats);
+    } catch (error) {
+      console.error("Erro ao carregar categorias:", error);
+    }
+  }, []);
 
   const loadTransacoes = useCallback(async () => {
     try {
@@ -63,8 +76,9 @@ export default function TransacoesScreen() {
   useFocusEffect(
     useCallback(() => {
       setIsLoading(true);
+      loadCategorias();
       loadTransacoes();
-    }, [loadTransacoes])
+    }, [loadTransacoes, loadCategorias])
   );
 
   function onRefresh() {
@@ -189,6 +203,32 @@ export default function TransacoesScreen() {
                 style={{ fontFamily: "Inter_500Medium" }}
               >
                 {item}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
+
+        {/* ─── Filtro por Categoria (scroll horizontal) ─────────────── */}
+        <FlatList
+          horizontal
+          data={[{ id: "all", nome: "Todas as Categorias", icone: "📋" }, ...categorias]}
+          keyExtractor={(item) => item.id}
+          showsHorizontalScrollIndicator={false}
+          className="mb-4 max-h-10"
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              className={`px-4 py-2 rounded-lg mr-2 flex-row items-center ${
+                categoriaSelecionada === item.id ? "bg-primary-600" : "bg-dark-card border border-dark-border"
+              }`}
+              onPress={() => setCategoriaSelecionada(item.id)}
+              activeOpacity={0.7}
+            >
+              <Text className="mr-1.5">{item.icone}</Text>
+              <Text
+                className={`text-xs ${categoriaSelecionada === item.id ? "text-white" : "text-dark-muted"}`}
+                style={{ fontFamily: "Inter_500Medium" }}
+              >
+                {item.nome}
               </Text>
             </TouchableOpacity>
           )}

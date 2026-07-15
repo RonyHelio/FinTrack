@@ -12,6 +12,8 @@ import {
 } from "@expo-google-fonts/inter";
 import { useCallback } from "react";
 import { AuthProvider } from "./src/contexts/AuthContext";
+import { ThemeProvider } from "./src/contexts/ThemeContext";
+import { NotificationProvider } from "./src/contexts/NotificationContext";
 import RootNavigator from "./src/navigation/RootNavigator";
 
 // Mantém a splash screen visível enquanto as fontes carregam
@@ -42,9 +44,13 @@ export default function App() {
   return (
     <View className="flex-1" onLayout={onLayoutRootView}>
       <StatusBar style="light" />
-      <AuthProvider>
-        <RootNavigator />
-      </AuthProvider>
+      <ThemeProvider>
+        <NotificationProvider>
+          <AuthProvider>
+            <RootNavigator />
+          </AuthProvider>
+        </NotificationProvider>
+      </ThemeProvider>
     </View>
   );
 }
